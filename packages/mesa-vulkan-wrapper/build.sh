@@ -1,4 +1,4 @@
-PKG_VER=25.0.0-[gss]
+PKG_VER=25.0.0-[JeezDisReez]
 PKG_CATEGORY="VulkanDriver"
 PKG_PRETTY_NAME="Mesa Android Wrapper"
 VK_DRIVER_LIB="libvulkan_wrapper.so"
