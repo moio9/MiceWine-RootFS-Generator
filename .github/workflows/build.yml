@@ -40,11 +40,11 @@ jobs:
         cd logs
         7z a /home/runner/MiceWine-RootFS-x86_64-Logs.zip
 
-    - name: "Create RootFS File (x86_64)"
-      run: |
-        cd MiceWine-RootFS-Generator
-        ./create-rootfs.sh x86_64
-        mv "MiceWine-RootFS-($(git rev-parse --short HEAD))-x86_64.rat" /home/runner/MiceWine-RootFS-x86_64.rat
+    # - name: "Create RootFS File (x86_64)"
+    #   run: |
+    #     cd MiceWine-RootFS-Generator
+    #     ./create-rootfs.sh x86_64
+    #     mv "MiceWine-RootFS-($(git rev-parse --short HEAD))-x86_64.rat" /home/runner/MiceWine-RootFS-x86_64.rat
 
     - name: "Clean (x86_64) RootFS"
       run: |
