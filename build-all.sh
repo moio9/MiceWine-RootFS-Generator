@@ -122,13 +122,14 @@ buildPackage() {
 	
 	cd "$INIT_DIR/workdir/$package/build_dir"
 	
-	cmake "$SRC_DIR" \
-		-DCMAKE_INSTALL_PREFIX=$PREFIX \
-		-DCMAKE_PREFIX_PATH=${FAKE_TERMUX_PREFIX:-$PREFIX} \
-		-DCMAKE_FIND_ROOT_PATH=${FAKE_TERMUX_PREFIX:-$PREFIX} \
-		-DZLIB_ROOT=${FAKE_TERMUX_PREFIX:-$PREFIX} \
-		-DCMAKE_EXE_LINKER_FLAGS="-lm" \
-		. || exit 1
+	if [ -f "$SRC_DIR/CMakeLists.txt" ]; then
+		cmake "$SRC_DIR" \
+			-DCMAKE_INSTALL_PREFIX=$PREFIX \
+			-DCMAKE_PREFIX_PATH=${FAKE_TERMUX_PREFIX:-$PREFIX} \
+			-DCMAKE_FIND_ROOT_PATH=${FAKE_TERMUX_PREFIX:-$PREFIX} \
+			-DZLIB_ROOT=${FAKE_TERMUX_PREFIX:-$PREFIX} \
+			-DCMAKE_EXE_LINKER_FLAGS="-lm" \
+			. || exit 1
 	elif [ -f "configure" ]; then
 		./configure --prefix=$PREFIX $CONFIGURE_ARGS || exit 1
 	else
