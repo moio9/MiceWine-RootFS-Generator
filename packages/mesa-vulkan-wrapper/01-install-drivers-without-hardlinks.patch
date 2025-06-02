@@ -4,18 +4,25 @@ index 216f6999feb..c79e95d1afd 100644
 +++ b/bin/install_megadrivers.py
 @@ -24,7 +24,16 @@
  
- import argparse
- import os
-+import shutil
-+ 
-+def link(src, dest):
-+    shutil.copyfile(src, dest)
- 
-+def unlink(src):
-+    os.remove(src)
-+
-+os.link = link
-+os.unlink = unlink
- 
- def resolve_libdir(libdir):
-     if os.path.isabs(libdir):
+import argparse
+import os
+import shutil
+
+# Compatibilitate Termux/Android: înlocuiește hardlink cu copiere
+def safe_link(src, dest):
+    try:
+        shutil.copyfile(src, dest)
+    except Exception as e:
+        print(f"Failed to copy '{src}' to '{dest}': {e}")
+
+def safe_unlink(path):
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+    except Exception as e:
+        print(f"Failed to remove '{path}': {e}")
+
+# Suprascrie funcțiile problematice
+os.link = safe_link
+os.unlink = safe_unlink
