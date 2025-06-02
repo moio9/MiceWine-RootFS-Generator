@@ -110,7 +110,9 @@ buildPackage() {
 	fi
 
 	# Simple build example (adjust per project)
-	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX ../$package || exit 1
+	SRC_DIR=$(find ../ -maxdepth 1 -type d -name "$package*" | head -n 1)
+	
+	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX "$SRC_DIR" || exit 1
 	make -j$(nproc) || exit 1
 	make DESTDIR="$INIT_DIR/workdir/$package/destdir" install || exit 1
 
