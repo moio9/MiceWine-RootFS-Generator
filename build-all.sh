@@ -113,7 +113,7 @@ buildPackage() {
 		mv ../"$EXTRACTED" ../"$package"
 	fi
 
-	SRC_DIR=$(find ../ -maxdepth 1 -type d -name "$package*" | head -n 1)
+	SRC_DIR=$(find "$INIT_DIR/workdir/$package" -maxdepth 1 -type d -name "$package*" | head -n 1)
  
 	if [ ! -d "$SRC_DIR" ]; then
 		echo "Source folder not found $package"
