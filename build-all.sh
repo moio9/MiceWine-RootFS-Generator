@@ -123,7 +123,11 @@ buildPackage() {
 	cd "$SRC_DIR"
 	
 	if [ -f "CMakeLists.txt" ]; then
-		cmake -DCMAKE_INSTALL_PREFIX=$PREFIX . || exit 1
+		cmake -DCMAKE_INSTALL_PREFIX=$PREFIX \
+		      -DCMAKE_PREFIX_PATH=$PREFIX \
+		      -DZLIB_ROOT=$PREFIX \
+		      -DCMAKE_FIND_ROOT_PATH=$PREFIX \
+		      . || exit 1
 	elif [ -f "configure" ]; then
 		./configure --prefix=$PREFIX $CONFIGURE_ARGS || exit 1
 	else
