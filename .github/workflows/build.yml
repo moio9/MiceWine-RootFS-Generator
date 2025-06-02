@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: "Clone Repository"
       run: |
-        git clone https://github.com/KreitinnSoftware/MiceWine-RootFS-Generator
+        git clone https://github.com/moio9/MiceWine-RootFS-Generator
 
     - name: "Environment Preparation"
       run: |
@@ -86,6 +86,3 @@ jobs:
             /home/runner/MiceWine-RootFS-aarch64.rat
             /home/runner/MiceWine-RootFS-aarch64-Logs.zip
             /home/runner/MiceWine-Packages.zip
-            /home/runner/MiceWine-RootFS-x86_64.rat
-            /home/runner/MiceWine-RootFS-x86_64-Logs.zip
-
