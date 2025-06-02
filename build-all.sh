@@ -107,6 +107,10 @@ buildPackage() {
 			curl -L -o "$INIT_DIR/cache/$package" "$SRC_URL"
 		fi
 		tar -xf "$INIT_DIR/cache/$package" -C ../
+	
+		# detect and rename
+		EXTRACTED=$(tar -tf "$INIT_DIR/cache/$package" | head -n 1 | cut -d '/' -f1)
+		mv ../"$EXTRACTED" ../"$package"
 	fi
 
 	SRC_DIR=$(find ../ -maxdepth 1 -type d -name "$package*" | head -n 1)
