@@ -109,10 +109,24 @@ buildPackage() {
 		tar -xf "$INIT_DIR/cache/$package" -C ../
 	fi
 
-	# Simple build example (adjust per project)
 	SRC_DIR=$(find ../ -maxdepth 1 -type d -name "$package*" | head -n 1)
+ 
+	if [ ! -d "$SRC_DIR" ]; then
+		echo "Source folder not found $package"
+		exit 1
+	fi
 	
-	cmake -DCMAKE_INSTALL_PREFIX=$PREFIX "$SRC_DIR" || exit 1
+	cd "$SRC_DIR"
+	
+	if [ -f "CMakeLists.txt" ]; then
+		cmake -DCMAKE_INSTALL_PREFIX=$PREFIX . || exit 1
+	elif [ -f "configure" ]; then
+		./configure --prefix=$PREFIX $CONFIGURE_ARGS || exit 1
+	else
+		echo "No CMakeLists.txt, no configure script for $package"
+		exit 1
+	fi
+	
 	make -j$(nproc) || exit 1
 	make DESTDIR="$INIT_DIR/workdir/$package/destdir" install || exit 1
 
