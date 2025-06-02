@@ -126,6 +126,8 @@ buildPackage() {
 		cmake -DCMAKE_INSTALL_PREFIX=$PREFIX \
 		      -DCMAKE_PREFIX_PATH=$PREFIX \
 		      -DZLIB_ROOT=$PREFIX \
+		      -DZLIB_LIBRARY=$PREFIX/lib/libz.so \
+		      -DZLIB_INCLUDE_DIR=$PREFIX/include \
 		      -DCMAKE_FIND_ROOT_PATH=$PREFIX \
 		      . || exit 1
 	elif [ -f "configure" ]; then
