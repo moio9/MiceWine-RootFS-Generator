@@ -19,13 +19,6 @@ jobs:
         pip3 install mako meson ninja docutils StrEnum
         sudo ln -sf ~/.local/bin/meson /usr/bin/meson
 
-    - name: "Setup Basic Android Runtime Environment (aarch64)"
-      run: |
-        git clone https://github.com/termux/termux-docker.git
-        sudo cp -rf termux-docker/system/aarch64 /system
-        sudo chown -R $(whoami):$(whoami) /system
-        sudo chmod 755 -R /system
-
     - name: "Download Previous Package Cache (Optional)"
       run: |
         cd termux-lib-builder
