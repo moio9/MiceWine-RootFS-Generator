@@ -20,12 +20,6 @@ jobs:
         sudo apt install -y libxcb1-dev
         sudo ln -sf ~/.local/bin/meson /usr/bin/meson
 
-    - name: "Download Previous Package Cache (Optional)"
-      run: |
-        cd termux-lib-builder
-        curl -LO# https://github.com/KreitinnSoftware/MiceWine-RootFS-Generator/releases/download/$(curl -s https://api.github.com/repos/KreitinnSoftware/MiceWine-RootFS-Generator/releases | grep tag_name -m 1 | cut -d ":" -f 2 | sed "s/\"//g" | sed "s/,//g" | sed "s/ //g")/MiceWine-Packages.zip || true
-        unzip -o MiceWine-Packages.zip -d built-pkgs || true
-
     - name: "Build All Packages (aarch64)"
       run: |
         cd termux-lib-builder
