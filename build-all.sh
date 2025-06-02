@@ -124,12 +124,9 @@ buildPackage() {
 	
 	if [ -f "CMakeLists.txt" ]; then
 		cmake -DCMAKE_INSTALL_PREFIX=$PREFIX \
-		      -DCMAKE_PREFIX_PATH=$PREFIX \
-		      -DZLIB_ROOT=$PREFIX \
-		      -DZLIB_LIBRARY=$PREFIX/lib/libz.so \
-		      -DZLIB_INCLUDE_DIR=$PREFIX/include \
-		      -DCMAKE_FIND_ROOT_PATH=$PREFIX \
-		      . || exit 1
+		-DCMAKE_PREFIX_PATH=${FAKE_TERMUX_PREFIX:-$PREFIX} \
+		-DCMAKE_FIND_ROOT_PATH=${FAKE_TERMUX_PREFIX:-$PREFIX} \
+	      	-DZLIB_ROOT=${FAKE_TERMUX_PREFIX:-$PREFIX} \
 	elif [ -f "configure" ]; then
 		./configure --prefix=$PREFIX $CONFIGURE_ARGS || exit 1
 	else
@@ -139,6 +136,15 @@ buildPackage() {
 	
 	make -j$(nproc) || exit 1
 	make DESTDIR="$INIT_DIR/workdir/$package/destdir" install || exit 1
+
+	# If building zlib, prepare fake prefix for next packages
+	if [ "$package" == "zlib" ]; then
+		export FAKE_TERMUX_PREFIX="$INIT_DIR/fake-termux-prefix"
+		mkdir -p "$FAKE_TERMUX_PREFIX/include" "$FAKE_TERMUX_PREFIX/lib"
+		ZLIB_OUT="$INIT_DIR/workdir/zlib/destdir/data/data/com.termux/files/usr"
+		cp -r "$ZLIB_OUT/include/"* "$FAKE_TERMUX_PREFIX/include/"
+		cp -r "$ZLIB_OUT/lib/"* "$FAKE_TERMUX_PREFIX/lib/"
+	fi
 
 	# Copy built files to output
 	cp -a "$INIT_DIR/workdir/$package/destdir/"* "$PREFIX/"
