@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -e
+
+ARCH="$1"
+
+if [ -z "$ARCH" ]; then
+	echo "Usage: $0 <architecture>"
+	echo "Example: $0 aarch64"
+	exit 1
+fi
+
+OUT_DIR="debs"
+mkdir -p "$OUT_DIR"
+
+for pkg in $(cat workdir/index); do
+	PKG_VER=$(cat "workdir/$pkg/pkg-ver")
+	PKG_NAME="$pkg-$PKG_VER-$ARCH"
+	PKG_DIR="$OUT_DIR/$PKG_NAME"
+
+	echo "📦 Generating .deb for $pkg..."
+
+	# Create DEBIAN/control folder
+	mkdir -p "$PKG_DIR/DEBIAN"
+
+	cat > "$PKG_DIR/DEBIAN/control" <<EOF
+Package: $pkg
+Version: $PKG_VER
+Architecture: $ARCH
+Maintainer: moio9@termux
+Description: Compiled various packages for Termux
+EOF
+
+	# Copy compiled files
+	mkdir -p "$PKG_DIR/data/data/com.termux"
+	cp -a "workdir/$pkg/destdir-pkg/data/data/com.termux/." "$PKG_DIR/data/data/com.termux/" || echo "⚠️ Warning: No compiled files for $pkg"
+
+	# Build the .deb
+	dpkg-deb --build "$PKG_DIR" "$OUT_DIR/${PKG_NAME}.deb"
+
+	# Optional: clean up the folder, leave only .deb
+	rm -rf "$PKG_DIR"
+done
+
+echo "✅ All .debs created in: $OUT_DIR/"
