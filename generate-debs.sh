@@ -88,4 +88,4 @@ EOF
 }
 
 
-generate_libcxx_shared
+generate_libcxx_shared "$ARCH"
