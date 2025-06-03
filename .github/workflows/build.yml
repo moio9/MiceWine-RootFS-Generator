@@ -64,6 +64,7 @@ jobs:
     
     - name: "Convert Built Packages to .deb (aarch64)"
       run: |
+        chmod +x termux-lib-builder/generate-debs.sh
         cd termux-lib-builder
         ./generate-debs.sh aarch64
     
