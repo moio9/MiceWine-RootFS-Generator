@@ -514,8 +514,6 @@ setupPackages
 
 compileAll
 
-./generate-deb.sh "$ARCHITECTURE"
-
 cd "$INIT_DIR"
 
 mkdir -p "$INIT_DIR/cache/libc++_shared/files/usr/lib"
