@@ -517,6 +517,6 @@ cd "$INIT_DIR"
 
 mkdir -p "$INIT_DIR/cache/libc++_shared/files/usr/lib"
 
-./generate-deb.sh "$ARCHITECTURE"
+#"$INIT_DIR/generate-deb.sh" "$ARCHITECTURE"
 
-./generate-deb.sh "libc++_shared" "Android C++ Library" "" "$ARCHITECTURE" "1.0" "library" "$INIT_DIR/cache/libc++_shared" "$INIT_DIR/built-pkgs"
+"$INIT_DIR/generate-deb.sh" "libc++_shared" "Android C++ Library" "" "$ARCHITECTURE" "1.0" "library" "$INIT_DIR/cache/libc++_shared" "$INIT_DIR/built-pkgs"
