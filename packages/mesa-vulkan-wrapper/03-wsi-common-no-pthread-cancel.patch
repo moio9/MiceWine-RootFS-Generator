@@ -85,4 +85,3 @@ index ff57a259046..4703500f374 100644
 +#endif
           pthread_join(wsi->hotplug_thread, NULL);
        }
- 
