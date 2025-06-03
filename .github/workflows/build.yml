@@ -1,4 +1,4 @@
-name: Build and Release MiceWine RootFS
+name: Build and Release libs for Termux
 
 on:
   workflow_dispatch:
@@ -27,11 +27,11 @@ jobs:
         sudo chown -R $(whoami):$(whoami) /system
         sudo chmod 755 -R /system
 
-    - name: "Download Latest Release Rat Packages"
+    - name: "Download Latest Release Package Cache"
       run: |
         cd termux-lib-builder
-        curl -LO# https://github.com/moio9/termux-lib-builder/releases/download/$(curl -s https://api.github.com/repos/moio9/termux-lib-builder/releases | grep tag_name -m 1 | cut -d ":" -f 2 | sed "s/\"//g" | sed "s/,//g" | sed "s/ //g")/MiceWine-Packages.zip || true
-        unzip -o MiceWine-Packages.zip -d built-pkgs || true
+        curl -LO# https://github.com/moio9/termux-lib-builder/releases/download/$(curl -s https://api.github.com/repos/moio9/termux-lib-builder/releases | grep tag_name -m 1 | cut -d ":" -f 2 | sed "s/\"//g" | sed "s/,//g" | sed "s/ //g")/packages-cache.tar.gz || true
+        tar -xzf packages-cache.tar.gz -C built-pkgs || true
 
     # - name: "Start Building (x86_64)"
     #   run: |
@@ -55,36 +55,36 @@ jobs:
       run: |
         cd termux-lib-builder
         ./build-all.sh aarch64 --ci
-        cd logs
-        7z a /home/runner/MiceWine-RootFS-aarch64-Logs.zip
-
-    - name: "Save All Rat Packages (for next build be faster)"
+        tar -czf /home/runner/build-logs-aarch64.tar.gz -C logs .
+    
+    - name: "Cache Built Libraries"
       run: |
         cd termux-lib-builder
-        cd built-pkgs
-        7z a /home/runner/MiceWine-Packages.zip
-        cd ..
-
-    # - name: "Create RootFS File (aarch64)"
-    #   run: |
-    #     cd termux-lib-builder
-    #     ./create-rootfs.sh aarch64
-    #     mv "MiceWine-RootFS-($(git rev-parse --short HEAD))-aarch64.rat" /home/runner/MiceWine-RootFS-aarch64.rat
-
+        tar -czf /home/runner/packages-cache.tar.gz -C built-pkgs .
+    
+    - name: "Convert Built Packages to .deb (aarch64)"
+      run: |
+        cd termux-lib-builder
+        ./generate-to-debs.sh aarch64
+    
+    - name: "Archive .deb Packages (.tar.gz)"
+      run: |
+        cd termux-lib-builder
+        tar -czf /home/runner/termux-debs-aarch64.tar.gz -C debs .
+    
     - name: "Get Short SHA"
       run: |
         cd termux-lib-builder
         echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+    
+    - name: "Create Release with .debs"
+      uses: softprops/action-gh-release@v2
+      with:
+        name: "Termux DEBs (${{ env.SHORT_SHA }})"
+        tag_name: ${{ env.SHORT_SHA }}
+        prerelease: true
+        files: |
+            /home/runner/termux-debs-aarch64.tar.gz
+            /home/runner/packages-cache.tar.gz
+            /home/runner/build-logs-aarch64.tar.gz
 
-    # - name: "Create Release"
-    #   uses: softprops/action-gh-release@v2
-    #   with:
-    #     name: "MiceWine RootFS (${{ env.SHORT_SHA }})"
-    #     tag_name: ${{ env.SHORT_SHA }}
-    #     prerelease: true
-    #     files: |
-    #         /home/runner/MiceWine-RootFS-aarch64.rat
-    #         /home/runner/MiceWine-RootFS-aarch64-Logs.zip
-    #         /home/runner/MiceWine-Packages.zip
-    #         /home/runner/MiceWine-RootFS-x86_64.rat
-    #         /home/runner/MiceWine-RootFS-x86_64-Logs.zip
