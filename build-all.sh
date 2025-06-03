@@ -132,6 +132,7 @@ setupPackage()
 	package=$1
 
 	. "$INIT_DIR/packages/$package/build.sh"
+ 	chmod +x $INIT_DIR/generate-debs.sh
 
 	if [ -n "$GIT_COMMIT" ]; then
 		PKG_VER=$(echo $PKG_VER | sed "s/\[gss\]/$(echo $GIT_COMMIT | cut -c1-7)/g")
