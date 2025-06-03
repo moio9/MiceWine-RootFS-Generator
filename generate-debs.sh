@@ -62,7 +62,17 @@ generate_libcxx_shared() {
 	mkdir -p "$PKG_DIR/DEBIAN"
 	mkdir -p "$PKG_DIR/data/data/com.termux/files/usr/lib"
 
-	cp "cache/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$ARCH-linux-android/libc++_shared.so" "$PKG_DIR/data/data/com.termux/files/usr/lib/"
+	# Corect: convertim ARCH în triple target real
+	case "$ARCH" in
+		aarch64) TARGET_TRIPLE="aarch64-linux-android" ;;
+		arm)     TARGET_TRIPLE="armv7a-linux-androideabi" ;;
+		x86_64)  TARGET_TRIPLE="x86_64-linux-android" ;;
+		i686)    TARGET_TRIPLE="i686-linux-android" ;;
+		*) echo "Unsupported ARCH: $ARCH" && exit 1 ;;
+	esac
+
+	cp "cache/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$TARGET_TRIPLE/libc++_shared.so" \
+		"$PKG_DIR/data/data/com.termux/files/usr/lib/"
 
 	cat > "$PKG_DIR/DEBIAN/control" <<EOF
 Package: $PKG_NAME
@@ -75,5 +85,6 @@ EOF
 	dpkg-deb --build "$PKG_DIR" "$OUT_DIR/${PKG_NAME}-${PKG_VER}-${ARCH}.deb"
 	rm -rf "$PKG_DIR"
 }
+
 
 generate_libcxx_shared
