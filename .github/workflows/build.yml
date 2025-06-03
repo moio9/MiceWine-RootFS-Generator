@@ -1,10 +1,11 @@
-name: Build Termux Package Cache (aarch64 only)
+name: Build and Release MiceWine RootFS
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
+
     runs-on: ubuntu-22.04
 
     steps:
@@ -17,30 +18,73 @@ jobs:
         sudo apt update
         sudo apt install -y python3 python3-pip cmake wget git p7zip build-essential pkg-config xmlto fop xsltproc llvm autoconf libxml-parser-perl bison flex glslang-tools
         pip3 install mako meson ninja docutils StrEnum
-        sudo apt install -y libxcb1-dev
         sudo ln -sf ~/.local/bin/meson /usr/bin/meson
 
-    - name: "Build All Packages (aarch64)"
+    - name: "Setup Basic Android (x86_64) Runtime Environment"
+      run: |
+        git clone https://github.com/termux/termux-docker.git
+        sudo cp -rf termux-docker/system/x86 /system
+        sudo chown -R $(whoami):$(whoami) /system
+        sudo chmod 755 -R /system
+
+    - name: "Download Latest Release Rat Packages"
+      run: |
+        cd termux-lib-builder
+        curl -LO# https://github.com/moio9/termux-lib-builder/releases/download/$(curl -s https://api.github.com/repos/moio9/termux-lib-builder/releases | grep tag_name -m 1 | cut -d ":" -f 2 | sed "s/\"//g" | sed "s/,//g" | sed "s/ //g")/MiceWine-Packages.zip || true
+        unzip -o MiceWine-Packages.zip -d built-pkgs || true
+
+    - name: "Start Building (x86_64)"
+      run: |
+        cd termux-lib-builder
+        ./build-all.sh x86_64 --ci
+        cd logs
+        7z a /home/runner/MiceWine-RootFS-x86_64-Logs.zip
+
+    - name: "Create RootFS File (x86_64)"
+      run: |
+        cd termux-lib-builder
+        ./create-rootfs.sh x86_64
+        mv "MiceWine-RootFS-($(git rev-parse --short HEAD))-x86_64.rat" /home/runner/MiceWine-RootFS-x86_64.rat
+
+    - name: "Clean (x86_64) RootFS"
+      run: |
+        cd termux-lib-builder
+        sudo rm -rf /data/data/com.termux/files/usr workdir rootfs
+
+    - name: "Start Building (aarch64)"
       run: |
         cd termux-lib-builder
         ./build-all.sh aarch64 --ci
+        cd logs
+        7z a /home/runner/MiceWine-RootFS-aarch64-Logs.zip
 
-    - name: "Save Package Cache as .tar"
+    - name: "Save All Rat Packages (for next build be faster)"
       run: |
         cd termux-lib-builder
-        tar -cf /home/runner/Termux-Packages.tar -C built-pkgs .
+        cd built-pkgs
+        7z a /home/runner/MiceWine-Packages.zip
+        cd ..
+
+    - name: "Create RootFS File (aarch64)"
+      run: |
+        cd termux-lib-builder
+        ./create-rootfs.sh aarch64
+        mv "MiceWine-RootFS-($(git rev-parse --short HEAD))-aarch64.rat" /home/runner/MiceWine-RootFS-aarch64.rat
 
     - name: "Get Short SHA"
       run: |
         cd termux-lib-builder
         echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-        
-    - name: "Upload Package Cache to Release"
+
+    - name: "Create Release"
       uses: softprops/action-gh-release@v2
       with:
-        name: "Termux Packages Cache (${{ env.SHORT_SHA }})"
+        name: "MiceWine RootFS (${{ env.SHORT_SHA }})"
         tag_name: ${{ env.SHORT_SHA }}
         prerelease: true
         files: |
-          /home/runner/Termux-Packages.tar
-
+            /home/runner/MiceWine-RootFS-aarch64.rat
+            /home/runner/MiceWine-RootFS-aarch64-Logs.zip
+            /home/runner/MiceWine-Packages.zip
+            /home/runner/MiceWine-RootFS-x86_64.rat
+            /home/runner/MiceWine-RootFS-x86_64-Logs.zip
