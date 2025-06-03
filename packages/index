@@ -57,7 +57,6 @@ mesa-vulkan-freedreno
 mesa-vulkan-radeon
 mesa-vulkan-wrapper-rev8
 mesa-vulkan-wrapper-rev9
-mesa-vulkan-wrapper
 mesa-zink
 pcre2
 glib
