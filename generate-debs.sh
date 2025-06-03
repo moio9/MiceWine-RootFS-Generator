@@ -54,22 +54,22 @@ echo "✅ All .debs created in: $OUT_DIR/"
 
 # Special libc++_shared package
 generate_libcxx_shared() {
+	local arch="$1"
 	PKG_NAME="libc++-shared"
 	PKG_VER="1.0"
-	PKG_DIR="$OUT_DIR/${PKG_NAME}-${PKG_VER}-${ARCH}"
+	PKG_DIR="$OUT_DIR/${PKG_NAME}-${PKG_VER}-${arch}"
 
 	echo "📦 Generating .deb for $PKG_NAME..."
 
 	mkdir -p "$PKG_DIR/DEBIAN"
 	mkdir -p "$PKG_DIR/data/data/com.termux/files/usr/lib"
 
-	# Corect: convertim ARCH în triple target real
-	case "$ARCH" in
+	case "$arch" in
 		aarch64) TARGET_TRIPLE="aarch64-linux-android" ;;
 		arm)     TARGET_TRIPLE="armv7a-linux-androideabi" ;;
 		x86_64)  TARGET_TRIPLE="x86_64-linux-android" ;;
 		i686)    TARGET_TRIPLE="i686-linux-android" ;;
-		*) echo "Unsupported ARCH: $ARCH" && exit 1 ;;
+		*) echo "Unsupported ARCH: $arch" && exit 1 ;;
 	esac
 
 	cp "cache/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$TARGET_TRIPLE/libc++_shared.so" \
@@ -78,12 +78,12 @@ generate_libcxx_shared() {
 	cat > "$PKG_DIR/DEBIAN/control" <<EOF
 Package: $PKG_NAME
 Version: $PKG_VER
-Architecture: $ARCH
+Architecture: $arch
 Maintainer: moio9@termux
 Description: Shared C++ standard library for Android/Termux
 EOF
 
-	dpkg-deb --build "$PKG_DIR" "$OUT_DIR/${PKG_NAME}-${PKG_VER}-${ARCH}.deb"
+	dpkg-deb --build "$PKG_DIR" "$OUT_DIR/${PKG_NAME}-${PKG_VER}-${arch}.deb"
 	rm -rf "$PKG_DIR"
 }
 
