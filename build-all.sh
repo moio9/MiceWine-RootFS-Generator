@@ -428,7 +428,7 @@ compileAll()
 				pkgPrettyName=$package
 			fi
 
-			$INIT_DIR/generate-debs.sh "$package" "$pkgPrettyName" "$vkDriverLib" "$ARCHITECTURE" "$pkgVersion" "$pkgCategory" "$packageDestDirPkg" "$INIT_DIR/built-pkgs" 0
+			( cd "$INIT_DIR" && ./generate-deb.sh "$ARCHITECTURE" "$package" )
 
 			if [ -n "$CI" ]; then
 				rm -rf "$INIT_DIR/workdir/$package"
@@ -514,7 +514,7 @@ setupPackages
 
 compileAll
 
-"$INIT_DIR/generate-deb.sh" "$ARCHITECTURE"
+./generate-deb.sh "$ARCHITECTURE"
 
 cd "$INIT_DIR"
 
