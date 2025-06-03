@@ -14,6 +14,11 @@ OUT_DIR="debs"
 mkdir -p "$OUT_DIR"
 
 for pkg in $(cat workdir/index); do
+	if [ ! -f "workdir/$pkg/pkg-ver" ]; then
+		echo "❌ Skipping $pkg: pkg-ver not found"
+		continue
+	fi
+
 	PKG_VER_RAW=$(cat "workdir/$pkg/pkg-ver")
 	PKG_VER=$(echo "$PKG_VER_RAW" | sed 's/^[^0-9]*//')  # elimină prefixul v sau altceva
 	PKG_NAME="$pkg-$PKG_VER-$ARCH"
@@ -32,9 +37,8 @@ Maintainer: moio9@termux
 Description: Compiled package for Termux
 EOF
 
-	# Copy compiled files from built-pkgs	
 	SOURCE_DIR=$(find "workdir/$pkg/destdir-pkg" -type d -name usr | head -n 1)
-	
+
 	if [ -d "$SOURCE_DIR" ]; then
 		mkdir -p "$PKG_DIR"
 		cp -a "$(dirname "$SOURCE_DIR")/." "$PKG_DIR/"
@@ -42,10 +46,7 @@ EOF
 		echo "⚠️ Warning: No compiled files for $pkg"
 	fi
 
-	# Build the .deb
 	dpkg-deb --build "$PKG_DIR" "$OUT_DIR/${PKG_NAME}.deb"
-
-	# Clean up intermediate dir
 	rm -rf "$PKG_DIR"
 done
 
