@@ -1,26 +1,26 @@
 diff --git a/src/vulkan/wrapper/wrapper_physical_device.c b/src/vulkan/wrapper/wrapper_physical_device.c
-index fcb2ac60a30..56a18847154 100644
+index 56a18847154..fcb2ac60a30 100644
 --- a/src/vulkan/wrapper/wrapper_physical_device.c
 +++ b/src/vulkan/wrapper/wrapper_physical_device.c
 @@ -155,7 +155,7 @@ VkResult enumerate_physical_device(struct vk_instance *_instance)
        }
        pdevice->vk.wsi_device = &pdevice->wsi_device;
        pdevice->wsi_device.force_bgra8_unorm_first = true;
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
        pdevice->wsi_device.wants_ahardware_buffer = true;
  #endif
  
 diff --git a/src/vulkan/wsi/wsi_common.c b/src/vulkan/wsi/wsi_common.c
-index 8b09e3dcd66..113b208f27b 100644
+index 113b208f27b..8b09e3dcd66 100644
 --- a/src/vulkan/wsi/wsi_common.c
 +++ b/src/vulkan/wsi/wsi_common.c
 @@ -47,7 +47,7 @@
  #include <unistd.h>
  #endif
  
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
  #include <android/hardware_buffer.h>
  #endif
  
@@ -28,8 +28,8 @@ index 8b09e3dcd66..113b208f27b 100644
     WSI_GET_CB(UnmapMemory);
     if (wsi->khr_present_wait)
        WSI_GET_CB(WaitSemaphores);
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     WSI_GET_CB(GetMemoryAndroidHardwareBufferANDROID);
     WSI_GET_CB(GetAndroidHardwareBufferPropertiesANDROID);
  #endif
@@ -37,8 +37,8 @@ index 8b09e3dcd66..113b208f27b 100644
        return wsi_cpu_image_needs_buffer_blit(wsi, cpu_params) ?
           WSI_SWAPCHAIN_BUFFER_BLIT : WSI_SWAPCHAIN_NO_BLIT;
     }
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     case WSI_IMAGE_TYPE_AHB: {
        return wsi_get_ahardware_buffer_blit_type(wsi, params, device);
     }
@@ -46,8 +46,8 @@ index 8b09e3dcd66..113b208f27b 100644
           container_of(params, const struct wsi_cpu_image_params, base);
        return wsi_configure_cpu_image(chain, pCreateInfo, cpu_params, info);
     }
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     case WSI_IMAGE_TYPE_AHB: {
        return wsi_configure_ahardware_buffer_image(chain, pCreateInfo, params, info);
     }
@@ -55,8 +55,8 @@ index 8b09e3dcd66..113b208f27b 100644
        vk_free(&chain->alloc, info->modifier_props);
        info->modifier_props = NULL;
     }
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     if (info->ahardware_buffer_desc != NULL) {
        vk_free(&chain->alloc, info->ahardware_buffer_desc);
        info->ahardware_buffer_desc = NULL;
@@ -64,34 +64,34 @@ index 8b09e3dcd66..113b208f27b 100644
  {
     const struct wsi_device *wsi = chain->wsi;
  
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     if (image->ahardware_buffer)
        AHardwareBuffer_release(image->ahardware_buffer);
  #endif
 diff --git a/src/vulkan/wsi/wsi_common.h b/src/vulkan/wsi/wsi_common.h
-index 0a795bb5712..2c0626761d7 100644
+index 2c0626761d7..0a795bb5712 100644
 --- a/src/vulkan/wsi/wsi_common.h
 +++ b/src/vulkan/wsi/wsi_common.h
 @@ -279,7 +279,7 @@ struct wsi_device {
     WSI_CB(MapMemory);
     WSI_CB(UnmapMemory);
     WSI_CB(WaitSemaphores);
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     WSI_CB(GetMemoryAndroidHardwareBufferANDROID);
     WSI_CB(GetAndroidHardwareBufferPropertiesANDROID);
  #endif
 diff --git a/src/vulkan/wsi/wsi_common_private.h b/src/vulkan/wsi/wsi_common_private.h
-index baa40decbab..74e0363f01a 100644
+index 74e0363f01a..baa40decbab 100644
 --- a/src/vulkan/wsi/wsi_common_private.h
 +++ b/src/vulkan/wsi/wsi_common_private.h
 @@ -87,7 +87,7 @@ struct wsi_image_info {
     VkExternalMemoryImageCreateInfo ext_mem;
     VkImageFormatListCreateInfo format_list;
     VkImageDrmFormatModifierListCreateInfoEXT drm_mod_list;
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     struct AHardwareBuffer_Desc *ahardware_buffer_desc;
  #endif
  
@@ -99,20 +99,21 @@ index baa40decbab..74e0363f01a 100644
     int dma_buf_fd;
  #endif
     void *cpu_map;
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     struct AHardwareBuffer *ahardware_buffer;
  #endif
+ };
 diff --git a/src/vulkan/wsi/wsi_common_x11.c b/src/vulkan/wsi/wsi_common_x11.c
-index 99cfd79b833..34e559cfad6 100644
+index 34e559cfad6..99cfd79b833 100644
 --- a/src/vulkan/wsi/wsi_common_x11.c
 +++ b/src/vulkan/wsi/wsi_common_x11.c
 @@ -69,7 +69,7 @@
  #include <sys/shm.h>
  #endif
  
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
  #include <android/hardware_buffer.h>
  #include <sys/socket.h>
  #endif
@@ -120,8 +121,8 @@ index 99cfd79b833..34e559cfad6 100644
        /* If the image has a modifier, we must have DRI3 v1.2. */
        assert(chain->has_dri3_modifiers);
  
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
        int sock_fds[2] = { -1, -1 };
        if (image->base.ahardware_buffer) {
           if (socketpair(AF_UNIX, SOCK_STREAM, 0, sock_fds) < 0) {
@@ -129,8 +130,8 @@ index 99cfd79b833..34e559cfad6 100644
                                                chain->depth, bpp,
                                                image->base.drm_modifier,
                                                fds);
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
        if (image->base.ahardware_buffer) {
           xcb_flush(chain->conn);
           uint8_t read_buf;
@@ -138,8 +139,8 @@ index 99cfd79b833..34e559cfad6 100644
           .alloc_shm = wsi_conn->has_mit_shm ? &alloc_shm : NULL,
        };
        image_params = &cpu_image_params.base;
--#ifdef __ANDROID__
-+#ifdef __TERMUX__
+-#ifdef __TERMUX__
++#ifdef __ANDROID__
     } else if (wsi_device->wants_ahardware_buffer) {
        image_params = &(struct wsi_base_image_params){
           .image_type = WSI_IMAGE_TYPE_AHB,
