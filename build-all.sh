@@ -137,7 +137,7 @@ setupPackage()
 		PKG_VER=$(echo $PKG_VER | sed "s/\[gss\]/$(echo $GIT_COMMIT | cut -c1-7)/g")
 	fi
 
-	if [ ! -f "$INIT_DIR/built-pkgs/$package-$PKG_VER-$ARCHITECTURE.rat" ]; then
+	if [ ! -f "$INIT_DIR/built-pkgs/$package-$PKG_VER-$ARCHITECTURE.tar.gz" ]; then
 		if [ -e "$INIT_DIR/workdir/$package/build.sh" ]; then
 			echo "-- Package '$package' already configured."
 		else
@@ -298,7 +298,7 @@ setupPackages()
 	mkdir -p "$PREFIX/include"
 
 	for package in $PACKAGES; do
-		packageFullPath=$(ls "$INIT_DIR/built-pkgs/$package"*"$ARCHITECTURE.rat" 2> /dev/zero)
+		packageFullPath=$(ls "$INIT_DIR/built-pkgs/$package"*"$ARCHITECTURE.tar.gz" 2> /dev/zero)
 		packageCommitFullPath=$(ls "$INIT_DIR/built-pkgs/$package"*"$ARCHITECTURE.commit" 2> /dev/zero)
 
 		if [ -f "$packageFullPath" ]; then
@@ -324,8 +324,8 @@ installBuiltPackage()
 {
 	local package=$1
 
-	if [ ! -e "$APP_ROOT_DIR/packages/$(basename $package .rat)" ]; then
-		echo "-- Installing '$(basename $package .rat)'"
+	if [ ! -e "$APP_ROOT_DIR/packages/$(basename $package .tar.gz)" ]; then
+		echo "-- Installing '$(basename $package .tar.gz)'"
 		mkdir -p $APP_ROOT_DIR/packages
 
 		unzip -o "$package" -d "$APP_ROOT_DIR" &> /dev/zero
@@ -334,7 +334,7 @@ installBuiltPackage()
 		bash $APP_ROOT_DIR/makeSymlinks.sh
 		rm -f $APP_ROOT_DIR/makeSymlinks.sh
 
-		touch $APP_ROOT_DIR/packages/$(basename $package .rat)
+		touch $APP_ROOT_DIR/packages/$(basename $package .tar.gz)
 	fi
 }
 
@@ -392,7 +392,7 @@ compileAll()
 			fi
 		fi
 
-		if [ -f "$INIT_DIR/built-pkgs/$package-$pkgVersion-$ARCHITECTURE.rat" ]; then
+		if [ -f "$INIT_DIR/built-pkgs/$package-$pkgVersion-$ARCHITECTURE.tar.gz" ]; then
 			echo "-- Package '$package' already built."
 		else
 			echo "-- Compiling Package '$package'..."
@@ -427,7 +427,7 @@ compileAll()
 				pkgPrettyName=$package
 			fi
 
-			$INIT_DIR/create-rat-pkg.sh "$package" "$pkgPrettyName" "$vkDriverLib" "$ARCHITECTURE" "$pkgVersion" "$pkgCategory" "$packageDestDirPkg" "$INIT_DIR/built-pkgs" 0
+			$INIT_DIR/generate-debs.sh "$package" "$pkgPrettyName" "$vkDriverLib" "$ARCHITECTURE" "$pkgVersion" "$pkgCategory" "$packageDestDirPkg" "$INIT_DIR/built-pkgs" 0
 
 			if [ -n "$CI" ]; then
 				rm -rf "$INIT_DIR/workdir/$package"
