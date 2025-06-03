@@ -29,14 +29,14 @@ Package: $pkg
 Version: $PKG_VER
 Architecture: $ARCH
 Maintainer: moio9@termux
-Description: Compiled various packages for Termux
+Description: Compiled package for Termux
 EOF
 
-	# Copy compiled files if exist
-	mkdir -p "$PKG_DIR/data/data/com.termux"
-	DEST_DIR="workdir/$pkg/destdir-pkg/data/data/com.termux"
-	if [ -d "$DEST_DIR" ]; then
-		cp -a "$DEST_DIR/." "$PKG_DIR/data/data/com.termux/"
+	# Copy compiled files from built-pkgs
+	SOURCE_DIR="built-pkgs/$pkg/files"
+	if [ -d "$SOURCE_DIR" ]; then
+		mkdir -p "$PKG_DIR/data/data/com.termux/files/usr"
+		cp -a "$SOURCE_DIR/." "$PKG_DIR/data/data/com.termux/files/usr/"
 	else
 		echo "⚠️ Warning: No compiled files for $pkg"
 	fi
@@ -44,12 +44,13 @@ EOF
 	# Build the .deb
 	dpkg-deb --build "$PKG_DIR" "$OUT_DIR/${PKG_NAME}.deb"
 
-	# Clean up
+	# Clean up intermediate dir
 	rm -rf "$PKG_DIR"
 done
 
 echo "✅ All .debs created in: $OUT_DIR/"
 
+# Special libc++_shared package
 generate_libcxx_shared() {
 	PKG_NAME="libc++-shared"
 	PKG_VER="1.0"
