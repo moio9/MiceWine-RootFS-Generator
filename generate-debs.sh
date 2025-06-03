@@ -43,3 +43,29 @@ EOF
 done
 
 echo "✅ All .debs created in: $OUT_DIR/"
+
+generate_libcxx_shared() {
+	PKG_NAME="libc++-shared"
+	PKG_VER="1.0"
+	PKG_DIR="$OUT_DIR/${PKG_NAME}-${PKG_VER}-${ARCH}"
+
+	echo "📦 Generating .deb for $PKG_NAME..."
+
+	mkdir -p "$PKG_DIR/DEBIAN"
+	mkdir -p "$PKG_DIR/data/data/com.termux/files/usr/lib"
+
+	cp "cache/android-ndk/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/$ARCH-linux-android/libc++_shared.so" "$PKG_DIR/data/data/com.termux/files/usr/lib/"
+
+	cat > "$PKG_DIR/DEBIAN/control" <<EOF
+Package: $PKG_NAME
+Version: $PKG_VER
+Architecture: $ARCH
+Maintainer: moio9@termux
+Description: Shared C++ standard library for Android/Termux
+EOF
+
+	dpkg-deb --build "$PKG_DIR" "$OUT_DIR/${PKG_NAME}-${PKG_VER}-${ARCH}.deb"
+	rm -rf "$PKG_DIR"
+}
+
+generate_libcxx_shared
