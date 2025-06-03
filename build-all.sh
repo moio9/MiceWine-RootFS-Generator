@@ -428,7 +428,7 @@ compileAll()
 				pkgPrettyName=$package
 			fi
 
-			( cd "$INIT_DIR" && ./generate-deb.sh "$ARCHITECTURE" "$package" )
+			( cd "$INIT_DIR" && ./generate-debs.sh "$ARCHITECTURE" "$package" )
 
 			if [ -n "$CI" ]; then
 				rm -rf "$INIT_DIR/workdir/$package"
@@ -518,4 +518,4 @@ cd "$INIT_DIR"
 
 mkdir -p "$INIT_DIR/cache/libc++_shared/files/usr/lib"
 
-./generate-deb.sh "libc++_shared" "Android C++ Library" "" "$ARCHITECTURE" "1.0" "library" "$INIT_DIR/cache/libc++_shared" "$INIT_DIR/built-pkgs"
+./generate-debs.sh "libc++_shared" "Android C++ Library" "" "$ARCHITECTURE" "1.0" "library" "$INIT_DIR/cache/libc++_shared" "$INIT_DIR/built-pkgs"
