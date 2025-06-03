@@ -32,12 +32,12 @@ Maintainer: moio9@termux
 Description: Compiled package for Termux
 EOF
 
-	# Copy compiled files from built-pkgs
-	SOURCE_DIR="workdir/$pkg/destdir-pkg/data/data/com.termux/files/usr"
- 
+	# Copy compiled files from built-pkgs	
+	SOURCE_DIR=$(find "workdir/$pkg/destdir-pkg" -type d -name usr | head -n 1)
+	
 	if [ -d "$SOURCE_DIR" ]; then
-		mkdir -p "$PKG_DIR/data/data/com.termux/files/usr"
-		cp -a "$SOURCE_DIR/." "$PKG_DIR/data/data/com.termux/files/usr/"
+		mkdir -p "$PKG_DIR"
+		cp -a "$(dirname "$SOURCE_DIR")/." "$PKG_DIR/"
 	else
 		echo "⚠️ Warning: No compiled files for $pkg"
 	fi
