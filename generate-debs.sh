@@ -33,7 +33,8 @@ Description: Compiled package for Termux
 EOF
 
 	# Copy compiled files from built-pkgs
-	SOURCE_DIR="built-pkgs/$pkg/files"
+	SOURCE_DIR="workdir/$pkg/destdir-pkg/data/data/com.termux/files/usr"
+ 
 	if [ -d "$SOURCE_DIR" ]; then
 		mkdir -p "$PKG_DIR/data/data/com.termux/files/usr"
 		cp -a "$SOURCE_DIR/." "$PKG_DIR/data/data/com.termux/files/usr/"
